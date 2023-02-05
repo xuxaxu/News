@@ -32,6 +32,7 @@
 		C9732CEA298FCD800051BA13 /* ArticleNetworkParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9732CE9298FCD800051BA13 /* ArticleNetworkParser.swift */; };
 		C9732CEC298FD06C0051BA13 /* ServiceCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9732CEB298FD06C0051BA13 /* ServiceCoordinator.swift */; };
 		C9732CEE298FDEA60051BA13 /* NewsListBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9732CED298FDEA60051BA13 /* NewsListBuilder.swift */; };
+		C9732CF1298FFF940051BA13 /* ImagesNetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9732CF0298FFF940051BA13 /* ImagesNetworkService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -62,6 +63,7 @@
 		C9732CE9298FCD800051BA13 /* ArticleNetworkParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleNetworkParser.swift; sourceTree = "<group>"; };
 		C9732CEB298FD06C0051BA13 /* ServiceCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceCoordinator.swift; sourceTree = "<group>"; };
 		C9732CED298FDEA60051BA13 /* NewsListBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsListBuilder.swift; sourceTree = "<group>"; };
+		C9732CF0298FFF940051BA13 /* ImagesNetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesNetworkService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,6 +123,7 @@
 		C9732CB9298FAF6F0051BA13 /* NetworkingLayer */ = {
 			isa = PBXGroup;
 			children = (
+				C9732CEF298FFF4E0051BA13 /* ImageNetwork */,
 				C9732CE2298FCAD60051BA13 /* NetworkModels */,
 				C9732CDD298FC0210051BA13 /* NewsListNetwork */,
 				C9732CCE298FBD600051BA13 /* NetworkClient */,
@@ -228,6 +231,14 @@
 			path = Helpers;
 			sourceTree = "<group>";
 		};
+		C9732CEF298FFF4E0051BA13 /* ImageNetwork */ = {
+			isa = PBXGroup;
+			children = (
+				C9732CF0298FFF940051BA13 /* ImagesNetworkService.swift */,
+			);
+			path = ImageNetwork;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -312,6 +323,7 @@
 				C9732CC8298FB6110051BA13 /* NewsListCellView.swift in Sources */,
 				C9732CCD298FBBD20051BA13 /* Store.swift in Sources */,
 				C9732CD6298FBD600051BA13 /* NetworkClientImp.swift in Sources */,
+				C9732CF1298FFF940051BA13 /* ImagesNetworkService.swift in Sources */,
 				C9732CC2298FB0930051BA13 /* NewsListModel.swift in Sources */,
 				C9732CE4298FCAED0051BA13 /* NetworkModel.swift in Sources */,
 				C9732CAC298FAF2E0051BA13 /* news_test.xcdatamodeld in Sources */,

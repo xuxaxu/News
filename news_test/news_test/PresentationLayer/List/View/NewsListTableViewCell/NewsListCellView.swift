@@ -12,6 +12,7 @@ class NewsListCellView: UITableViewCell {
     }
     private lazy var imageFirstView: UIImageView = {
         let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
@@ -23,7 +24,7 @@ class NewsListCellView: UITableViewCell {
         return label
     }()
     
-    private lazy var openedLabel: UILabel = {
+    private lazy var detailedLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -34,10 +35,13 @@ class NewsListCellView: UITableViewCell {
         self.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
         addSubview(imageFirstView)
         addSubview(titleLabel)
+        addSubview(detailedLabel)
         
-        layoutMargins = UIEdgeInsets(top: 0,
+        layoutMargins = UIEdgeInsets(top: DesignConstants.offset,
                                      left: DesignConstants.offset,
-                                     bottom: 0, right: 0)
+                                     bottom: -DesignConstants.offset,
+                                     right: 0)
+         
         preservesSuperviewLayoutMargins = false
     }
     
@@ -45,13 +49,21 @@ class NewsListCellView: UITableViewCell {
         
         imageFirstView.image = item.image
         titleLabel.text = item.title
-        openedLabel.text = String(item.detailed)
+        detailedLabel.text = String(item.detailed)
        
         NSLayoutConstraint.activate([
-            titleLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: DesignConstants.offset),
-            titleLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -DesignConstants.offset),
+            imageFirstView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
+            imageFirstView.topAnchor.constraint(equalTo: self.topAnchor),
+            imageFirstView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+            imageFirstView.trailingAnchor.constraint(equalTo: self.leadingAnchor, constant: DesignConstants.height),
+            titleLabel.leadingAnchor.constraint(equalTo: imageFirstView.trailingAnchor, constant: DesignConstants.offset),
+            titleLabel.trailingAnchor.constraint(equalTo: detailedLabel.leadingAnchor, constant: -DesignConstants.offset),
             titleLabel.topAnchor.constraint(equalTo: self.topAnchor, constant: DesignConstants.offset),
-            titleLabel.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: DesignConstants.offset)
+            titleLabel.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -DesignConstants.offset),
+            //detailedLabel.leadingAnchor.constraint(equalTo: self.trailingAnchor, constant: -DesignConstants.offset*2),
+            detailedLabel.topAnchor.constraint(equalTo: self.topAnchor),
+            detailedLabel.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+            detailedLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -DesignConstants.offset*2)
         ])
         
     }

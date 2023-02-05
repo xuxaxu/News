@@ -13,17 +13,21 @@ class ServiceCoordinatorImp: ServiceCoordinator {
     private let store: Store
     private let newsListService: NewsListNetworkService
     private let parser: ArticleNetworkParser
+    private let imageService: ImagesNetworkService
     
     static let shared: ServiceCoordinatorImp = .init(
         newsListNetworkService: NewsListNetworkServiceImp(networkClient: NetworkClientImp(urlSession: URLSession(configuration: .default))),
-        articleParser: ArticleNetworkParserImp()
+        articleParser: ArticleNetworkParserImp(),
+        imageNetworkService: ImagesNetworkServiceImp(networkClient: NetworkClientImp(urlSession: URLSession(configuration: .default)))
     )
     
     init(newsListNetworkService: NewsListNetworkService,
-         articleParser: ArticleNetworkParser) {
+         articleParser: ArticleNetworkParser,
+         imageNetworkService: ImagesNetworkService) {
         self.store = Store()
         self.newsListService = newsListNetworkService
         self.parser = articleParser
+        self.imageService = imageNetworkService
         askNextPortionOfNews()
     }
     func askNews() {
@@ -43,6 +47,9 @@ class ServiceCoordinatorImp: ServiceCoordinator {
                 for netArticle in response.articles {
                     if let article = self?.parser.parse(article: netArticle) {
                         self?.store.addArticle(article)
+                        if let imageUrl = article.urlToImage {
+                            self?.loadImage(imageUrl, for: (self?.store.count() ?? 1) - 1)
+                        }
                     }
                 }
             }
@@ -52,10 +59,18 @@ class ServiceCoordinatorImp: ServiceCoordinator {
         store.count()
     }
     func getListItem(for index: Int) -> NewsListItem? {
-        guard let (article, wasDetailed) = store.getArticle(at: index) else {
-            return nil
+        store.getArticle(at: index)
+    }
+    func loadImage(_ url: URL, for index: Int) {
+        imageService.getImage(url: url) { [weak self] result in
+            switch result {
+            case .failure(let error):
+                print("image loading error \(error)")
+            case .success(let image):
+                self?.store.setImage(url, image)
+                NotificationCenter.default.post(name: .ImageLoadedForNews, object: index)
+            }
         }
-        return NewsListItem(image: article.image, title: article.title, detailed: wasDetailed)
     }
     func openDetail(_ index: Int) {
         
@@ -65,4 +80,6 @@ class ServiceCoordinatorImp: ServiceCoordinator {
 extension Notification.Name {
     static let ErrorDuringNewsLoading = Notification.Name(
         rawValue: "com.News-test.ServiceCoordinator.errorDuringLoadingNewsOccurs")
+    static let ImageLoadedForNews = Notification.Name(
+        rawValue: "com.News-test.ServiceCoordinator.imageLoadedForNewsWithIndex")
 }

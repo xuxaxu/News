@@ -6,4 +6,5 @@ protocol NewsListViewOutput: AnyObject {
     func askForUpdate()
     func scroll()
     func itemSelected(indexPath: IndexPath)
+    func getTitle() -> String
 }

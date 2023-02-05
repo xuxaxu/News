@@ -19,7 +19,7 @@ class NewsListViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemTeal
+        title = output.getTitle()
         configureTableView()
         output.askForUpdate()
     }
@@ -28,7 +28,6 @@ class NewsListViewController: UIViewController {
         view.addSubview(tableView)
         tableView.delegate = self
         tableView.dataSource = self
-        //tableView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         tableView.register(NewsListCellView.self, forCellReuseIdentifier: Constants.cellNameForReuseId)
         tableView.estimatedRowHeight = DesignConstants.height
         tableView.rowHeight = UITableView.automaticDimension
@@ -38,8 +37,8 @@ class NewsListViewController: UIViewController {
         
         tableView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: DesignConstants.offset),
-            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: DesignConstants.offset),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: DesignConstants.offset),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: DesignConstants.offset)
         ])
@@ -70,7 +69,7 @@ extension NewsListViewController: UITableViewDelegate, UITableViewDataSource {
         output.countOfItems()
     }
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return DesignConstants.height
+        return 0
     }
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
          return UILabel()
@@ -91,9 +90,11 @@ extension NewsListViewController: NewsListViewInput {
     func update(with data: NewsListState) {
         switch data {
         case .success(let index):
-            tableView.reloadData()
-            view.setNeedsLayout()
-            //tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .left)
+            if let index = index {
+                tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .left)
+            } else {
+                tableView.reloadData()
+            } 
         case .error:
             showError()
         case .loading:

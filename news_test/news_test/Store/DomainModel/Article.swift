@@ -8,6 +8,7 @@ struct Article {
     let image: UIImage?
     let date: Date?
     let url: URL?
+    let urlToImage: URL?
 }
 
 struct NewsListItem {
