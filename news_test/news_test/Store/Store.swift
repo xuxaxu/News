@@ -1,67 +1,75 @@
 import Foundation
 import UIKit
 
-class Store {
-    var items = [Article]()
-    var currentPage: Int = 1
-    var detailed = [Int: Int]()
-    var images = [URL: UIImage]()
+class Store: ObservableObject {
+    @Published var state: AppState
     
-    func addArticle(_ article: Article) {
-        items.append(article)
-        NotificationCenter.default.post(name: .NewsItemsChanges,
-                                        object: items.count - 1)
+    init(state: AppState, reducer: @escaping (inout AppState, AppAction) -> Void) {
+        self.state = state
+        self.reducer = reducer
     }
     
-    func pagesLoadedFromCurrent(_ loaded: Int) {
-        if loaded > items.count {
-            currentPage += 1
-        }
+    let reducer: (inout AppState, AppAction) -> Void
+    
+    func reduce(_ action: AppAction) {
+        reducer(&state, action)
     }
     
     func getArticle(at index: Int) -> NewsListItem? {
-        guard index < items.count else {
+        guard index < state.items.count else {
             return nil
         }
-        let article = items[index]
+        let article = state.items[index]
         let image: UIImage?
         if let imageUrl = article.urlToImage {
-            image = images[imageUrl]
+            image = state.images[imageUrl]
         } else {
             image = nil
         }
-        let wawDetailed = detailed[index] ?? 0
+        let wawDetailed = state.detailed[index] ?? 0
         let item = NewsListItem(image: image, title: article.title, detailed: wawDetailed)
             return item
 
     }
     func count() -> Int {
-        items.count
+        state.items.count
     }
-    func clear() {
-        items = []
-        currentPage = 1
-        NotificationCenter.default.post(name: .NewsItemsChanges,
-                                        object: -1)
-    }
+    
     func getImage(for index: Int) -> UIImage? {
-        guard index < items.count, let url = items[index].urlToImage else {
+        guard index < state.items.count, let url = state.items[index].urlToImage else {
             return nil
         }
-        return images[url]
+        return state.images[url]
     }
     func getImageUrl(for index: Int) -> URL? {
-        guard index < items.count else {
+        guard index < state.items.count else {
             return nil
         }
-        return items[index].urlToImage
-    }
-    func setImage(_ url: URL, _ image: UIImage) {
-        images[url] = image
+        return state.items[index].urlToImage
     }
 }
 
 extension Notification.Name {
     static let NewsItemsChanges = Notification.Name(
         rawValue: "com.News-test.Store.changesInNewsArray")
+}
+
+enum AppAction {
+    case items(ItemAction)
+    case page(PageAction)
+    case images(ImageAction)
+}
+
+enum PageAction {
+    case incrementPage
+    case resetPage
+}
+
+enum ItemAction {
+    case addArticle(Article)
+    case clear
+}
+
+enum ImageAction {
+    case setImage(image: UIImage, url: URL)
 }

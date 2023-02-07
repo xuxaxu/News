@@ -4,6 +4,8 @@ class NewsListPresenter {
     
     private var serviceCoordinator: ServiceCoordinator
     
+    private var isLodaing = false
+    
     public weak var view: NewsListViewInput? {
         didSet {
             view?.update(with: .loading)
@@ -34,6 +36,7 @@ class NewsListPresenter {
             view?.update(with: .loading)
         } else {
             view?.update(with: .success(nil))
+            isLodaing = false
         }
     }
     @objc private func imageLoaded(_ notification: Notification) {
@@ -45,12 +48,18 @@ class NewsListPresenter {
 }
 
 extension NewsListPresenter: NewsListViewOutput {
+    
     func getTitle() -> String {
         GlobalConstants.domains
     }
     
     func getItem(for index: IndexPath) -> NewsListItem? {
-        serviceCoordinator.getListItem(for: index.row)
+        let item = serviceCoordinator.getListItem(for: index.row)
+        if serviceCoordinator.countOfNews() - index.row < 5, !isLodaing {
+            serviceCoordinator.askNextPortionOfNews()
+            isLodaing = true
+        }
+        return item
     }
     
     func countOfItems() -> Int {

@@ -24,29 +24,26 @@ class ServiceCoordinatorImp: ServiceCoordinator {
     init(newsListNetworkService: NewsListNetworkService,
          articleParser: ArticleNetworkParser,
          imageNetworkService: ImagesNetworkService) {
-        self.store = Store()
+        self.store = Store(state: AppState(), reducer: reducer(_:_:))
         self.newsListService = newsListNetworkService
         self.parser = articleParser
         self.imageService = imageNetworkService
-        askNextPortionOfNews()
     }
     func askNews() {
-        store.clear()
+        store.reduce(.items(.clear))
+        store.reduce(.page(.resetPage))
         askNextPortionOfNews()
     }
     func askNextPortionOfNews() {
-        newsListService.getNews(page: store.currentPage) {[weak self] result in
+        newsListService.getNews(page: store.state.currentPage) {[weak self] result in
             switch result {
             case .failure(let error):
                 NotificationCenter.default.post(name: .ErrorDuringNewsLoading, object: error)
             case .success(let response):
-                guard let loaded = response.totalResults else {
-                    return
-                }
-                self?.store.pagesLoadedFromCurrent(loaded)
+                self?.store.reduce(.page(.resetPage))
                 for netArticle in response.articles {
                     if let article = self?.parser.parse(article: netArticle) {
-                        self?.store.addArticle(article)
+                        self?.store.reduce(.items(.addArticle(article)))
                         if let imageUrl = article.urlToImage {
                             self?.loadImage(imageUrl, for: (self?.store.count() ?? 1) - 1)
                         }
@@ -54,6 +51,7 @@ class ServiceCoordinatorImp: ServiceCoordinator {
                 }
             }
         }
+        store.reduce(.page(.incrementPage))
     }
     func countOfNews() -> Int {
         store.count()
@@ -67,7 +65,7 @@ class ServiceCoordinatorImp: ServiceCoordinator {
             case .failure(let error):
                 print("image loading error \(error)")
             case .success(let image):
-                self?.store.setImage(url, image)
+                self?.store.reduce(.images(.setImage(image: image, url: url)))
                 NotificationCenter.default.post(name: .ImageLoadedForNews, object: index)
             }
         }

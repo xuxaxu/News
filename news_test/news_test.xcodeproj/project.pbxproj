@@ -33,6 +33,11 @@
 		C9732CEC298FD06C0051BA13 /* ServiceCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9732CEB298FD06C0051BA13 /* ServiceCoordinator.swift */; };
 		C9732CEE298FDEA60051BA13 /* NewsListBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9732CED298FDEA60051BA13 /* NewsListBuilder.swift */; };
 		C9732CF1298FFF940051BA13 /* ImagesNetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9732CF0298FFF940051BA13 /* ImagesNetworkService.swift */; };
+		C9732CF32991173B0051BA13 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9732CF22991173B0051BA13 /* AppState.swift */; };
+		C9732CF529911BF50051BA13 /* AppStateReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9732CF429911BF50051BA13 /* AppStateReducer.swift */; };
+		C9732CF829913CB10051BA13 /* ItemReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9732CF729913CB10051BA13 /* ItemReducer.swift */; };
+		C9732CFA299140400051BA13 /* IntReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9732CF9299140400051BA13 /* IntReducer.swift */; };
+		C9732CFC299141AA0051BA13 /* imagesReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9732CFB299141AA0051BA13 /* imagesReducer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -64,6 +69,11 @@
 		C9732CEB298FD06C0051BA13 /* ServiceCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceCoordinator.swift; sourceTree = "<group>"; };
 		C9732CED298FDEA60051BA13 /* NewsListBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsListBuilder.swift; sourceTree = "<group>"; };
 		C9732CF0298FFF940051BA13 /* ImagesNetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesNetworkService.swift; sourceTree = "<group>"; };
+		C9732CF22991173B0051BA13 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		C9732CF429911BF50051BA13 /* AppStateReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateReducer.swift; sourceTree = "<group>"; };
+		C9732CF729913CB10051BA13 /* ItemReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemReducer.swift; sourceTree = "<group>"; };
+		C9732CF9299140400051BA13 /* IntReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntReducer.swift; sourceTree = "<group>"; };
+		C9732CFB299141AA0051BA13 /* imagesReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = imagesReducer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -179,8 +189,10 @@
 		C9732CCB298FBBC50051BA13 /* Store */ = {
 			isa = PBXGroup;
 			children = (
+				C9732CF629913C9F0051BA13 /* Reducers */,
 				C9732CE5298FCC920051BA13 /* DomainModel */,
 				C9732CCC298FBBD20051BA13 /* Store.swift */,
+				C9732CF22991173B0051BA13 /* AppState.swift */,
 				C9732CEB298FD06C0051BA13 /* ServiceCoordinator.swift */,
 			);
 			path = Store;
@@ -237,6 +249,17 @@
 				C9732CF0298FFF940051BA13 /* ImagesNetworkService.swift */,
 			);
 			path = ImageNetwork;
+			sourceTree = "<group>";
+		};
+		C9732CF629913C9F0051BA13 /* Reducers */ = {
+			isa = PBXGroup;
+			children = (
+				C9732CF429911BF50051BA13 /* AppStateReducer.swift */,
+				C9732CF729913CB10051BA13 /* ItemReducer.swift */,
+				C9732CF9299140400051BA13 /* IntReducer.swift */,
+				C9732CFB299141AA0051BA13 /* imagesReducer.swift */,
+			);
+			path = Reducers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -314,6 +337,8 @@
 				C9732CA6298FAF2E0051BA13 /* NewsListViewController.swift in Sources */,
 				C9732CDC298FBFB40051BA13 /* NewsListNetworkService.swift in Sources */,
 				C9732CE1298FC1E70051BA13 /* GlobalConstants.swift in Sources */,
+				C9732CF829913CB10051BA13 /* ItemReducer.swift in Sources */,
+				C9732CFC299141AA0051BA13 /* imagesReducer.swift in Sources */,
 				C9732CC0298FB0200051BA13 /* NewsListViewOutput.swift in Sources */,
 				C9732CBB298FAFB00051BA13 /* NewsListPresenter.swift in Sources */,
 				C9732CCA298FB6EF0051BA13 /* DesignConstants.swift in Sources */,
@@ -325,11 +350,14 @@
 				C9732CD6298FBD600051BA13 /* NetworkClientImp.swift in Sources */,
 				C9732CF1298FFF940051BA13 /* ImagesNetworkService.swift in Sources */,
 				C9732CC2298FB0930051BA13 /* NewsListModel.swift in Sources */,
+				C9732CF529911BF50051BA13 /* AppStateReducer.swift in Sources */,
+				C9732CF32991173B0051BA13 /* AppState.swift in Sources */,
 				C9732CE4298FCAED0051BA13 /* NetworkModel.swift in Sources */,
 				C9732CAC298FAF2E0051BA13 /* news_test.xcdatamodeld in Sources */,
 				C9732CC4298FB1360051BA13 /* NewsListViewInput.swift in Sources */,
 				C9732CD9298FBD600051BA13 /* HTTPMethod.swift in Sources */,
 				C9732CD7298FBD600051BA13 /* HTTPRequest.swift in Sources */,
+				C9732CFA299140400051BA13 /* IntReducer.swift in Sources */,
 				C9732CEA298FCD800051BA13 /* ArticleNetworkParser.swift in Sources */,
 				C9732CD5298FBD600051BA13 /* NetworkClient.swift in Sources */,
 				C9732CDA298FBD600051BA13 /* HTTPError.swift in Sources */,

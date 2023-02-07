@@ -6,8 +6,6 @@ class NewsListViewController: UIViewController {
     
     private lazy var tableView: UITableView = UITableView()
     
-    private lazy var refreshControl = UIRefreshControl()
-    
     init(output: NewsListViewOutput) {
         self.output = output
         super.init(nibName: nil, bundle: nil)
@@ -30,7 +28,7 @@ class NewsListViewController: UIViewController {
         tableView.dataSource = self
         tableView.register(NewsListCellView.self, forCellReuseIdentifier: Constants.cellNameForReuseId)
         tableView.estimatedRowHeight = DesignConstants.height
-        tableView.rowHeight = UITableView.automaticDimension
+        tableView.rowHeight = DesignConstants.height //UITableView.automaticDimension
         
         tableView.refreshControl = UIRefreshControl()
         tableView.refreshControl?.addTarget(self, action: #selector(refresh), for: .valueChanged)
@@ -90,15 +88,16 @@ extension NewsListViewController: NewsListViewInput {
     func update(with data: NewsListState) {
         switch data {
         case .success(let index):
-            if let index = index {
-                tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .left)
-            } else {
+            tableView.refreshControl?.endRefreshing()
+            //if let index = index {
+              //  tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .left)
+            //} else {
                 tableView.reloadData()
-            } 
+            //} 
         case .error:
             showError()
         case .loading:
-            refreshControl.beginRefreshing()
+            tableView.refreshControl?.beginRefreshing()
         }
     }
     

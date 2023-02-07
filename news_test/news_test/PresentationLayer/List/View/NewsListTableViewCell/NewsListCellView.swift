@@ -21,6 +21,7 @@ class NewsListCellView: UITableViewCell {
         label.numberOfLines = 3
         //label.font = UIFont.
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.sizeToFit()
         return label
     }()
     
@@ -52,7 +53,7 @@ class NewsListCellView: UITableViewCell {
         detailedLabel.text = String(item.detailed)
        
         NSLayoutConstraint.activate([
-            imageFirstView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
+            imageFirstView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: DesignConstants.leadingOffset),
             imageFirstView.topAnchor.constraint(equalTo: self.topAnchor),
             imageFirstView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
             imageFirstView.trailingAnchor.constraint(equalTo: self.leadingAnchor, constant: DesignConstants.height),
@@ -60,10 +61,10 @@ class NewsListCellView: UITableViewCell {
             titleLabel.trailingAnchor.constraint(equalTo: detailedLabel.leadingAnchor, constant: -DesignConstants.offset),
             titleLabel.topAnchor.constraint(equalTo: self.topAnchor, constant: DesignConstants.offset),
             titleLabel.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -DesignConstants.offset),
-            //detailedLabel.leadingAnchor.constraint(equalTo: self.trailingAnchor, constant: -DesignConstants.offset*2),
+            detailedLabel.leadingAnchor.constraint(equalTo: self.trailingAnchor, constant: -DesignConstants.disclosureOffset),
             detailedLabel.topAnchor.constraint(equalTo: self.topAnchor),
             detailedLabel.bottomAnchor.constraint(equalTo: self.bottomAnchor),
-            detailedLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -DesignConstants.offset*2)
+            detailedLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -DesignConstants.offset*3)
         ])
         
     }
