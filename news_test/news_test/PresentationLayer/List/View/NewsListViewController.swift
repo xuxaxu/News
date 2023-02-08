@@ -19,7 +19,7 @@ class NewsListViewController: UIViewController {
         super.viewDidLoad()
         title = output.getTitle()
         configureTableView()
-        output.askForUpdate()
+        refresh()
     }
     private func configureTableView() {
         tableView = UITableView()

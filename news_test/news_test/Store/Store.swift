@@ -53,23 +53,3 @@ extension Notification.Name {
     static let NewsItemsChanges = Notification.Name(
         rawValue: "com.News-test.Store.changesInNewsArray")
 }
-
-enum AppAction {
-    case items(ItemAction)
-    case page(PageAction)
-    case images(ImageAction)
-}
-
-enum PageAction {
-    case incrementPage
-    case resetPage
-}
-
-enum ItemAction {
-    case addArticle(Article)
-    case clear
-}
-
-enum ImageAction {
-    case setImage(image: UIImage, url: URL)
-}

@@ -14,44 +14,60 @@ class ServiceCoordinatorImp: ServiceCoordinator {
     private let newsListService: NewsListNetworkService
     private let parser: ArticleNetworkParser
     private let imageService: ImagesNetworkService
+    private let persistanceService: PersistanceService
     
     static let shared: ServiceCoordinatorImp = .init(
         newsListNetworkService: NewsListNetworkServiceImp(networkClient: NetworkClientImp(urlSession: URLSession(configuration: .default))),
         articleParser: ArticleNetworkParserImp(),
-        imageNetworkService: ImagesNetworkServiceImp(networkClient: NetworkClientImp(urlSession: URLSession(configuration: .default)))
+        imageNetworkService: ImagesNetworkServiceImp(networkClient: NetworkClientImp(urlSession: URLSession(configuration: .default))),
+        persistanceService: CoreDataPersistance()
     )
     
     init(newsListNetworkService: NewsListNetworkService,
          articleParser: ArticleNetworkParser,
-         imageNetworkService: ImagesNetworkService) {
+         imageNetworkService: ImagesNetworkService,
+         persistanceService: PersistanceService) {
         self.store = Store(state: AppState(), reducer: reducer(_:_:))
         self.newsListService = newsListNetworkService
         self.parser = articleParser
         self.imageService = imageNetworkService
+        self.persistanceService = persistanceService
     }
     func askNews() {
         store.reduce(.items(.clear))
         store.reduce(.page(.resetPage))
+        persistanceService.deleteAllImages(completion: {_ in })
         askNextPortionOfNews()
     }
     func askNextPortionOfNews() {
+        store.reduce(.page(.incrementPage))
         newsListService.getNews(page: store.state.currentPage) {[weak self] result in
             switch result {
             case .failure(let error):
                 NotificationCenter.default.post(name: .ErrorDuringNewsLoading, object: error)
-            case .success(let response):
-                self?.store.reduce(.page(.resetPage))
-                for netArticle in response.articles {
-                    if let article = self?.parser.parse(article: netArticle) {
-                        self?.store.reduce(.items(.addArticle(article)))
-                        if let imageUrl = article.urlToImage {
-                            self?.loadImage(imageUrl, for: (self?.store.count() ?? 1) - 1)
+                self?.persistanceService.getAllArticles { [weak self] result in
+                    switch result {
+                    case .failure(let error):
+                        NotificationCenter.default.post(name: .ErrorDuringNewsLoading, object: error)
+                    case .success(let items):
+                        for item in items {
+                            self?.store.reduce(.items(.addArticle(item)))
                         }
                     }
                 }
+            case .success(let response):
+                guard let self else { return }
+                for netArticle in response.articles {
+                    if let article = self.parser.parse(article: netArticle) {
+                        self.store.reduce(.items(.addArticle(article)))
+                        if let imageUrl = article.urlToImage {
+                            self.loadImage(imageUrl, for: (self.store.count()) - 1)
+                        }
+                    }
+                }
+                self.saveArticles()
             }
         }
-        store.reduce(.page(.incrementPage))
     }
     func countOfNews() -> Int {
         store.count()
@@ -66,12 +82,16 @@ class ServiceCoordinatorImp: ServiceCoordinator {
                 print("image loading error \(error)")
             case .success(let image):
                 self?.store.reduce(.images(.setImage(image: image, url: url)))
+                self?.persistanceService.postImage(image, url: url, completion: {_ in})
                 NotificationCenter.default.post(name: .ImageLoadedForNews, object: index)
             }
         }
     }
     func openDetail(_ index: Int) {
         
+    }
+    private func saveArticles() {
+        persistanceService.postAllArticles(store.state.items, completion: {_ in } )
     }
 }
 

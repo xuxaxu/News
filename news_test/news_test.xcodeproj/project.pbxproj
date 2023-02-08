@@ -38,6 +38,10 @@
 		C9732CF829913CB10051BA13 /* ItemReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9732CF729913CB10051BA13 /* ItemReducer.swift */; };
 		C9732CFA299140400051BA13 /* IntReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9732CF9299140400051BA13 /* IntReducer.swift */; };
 		C9732CFC299141AA0051BA13 /* imagesReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9732CFB299141AA0051BA13 /* imagesReducer.swift */; };
+		C9732D01299299600051BA13 /* CoreDataConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9732D00299299600051BA13 /* CoreDataConstants.swift */; };
+		C9732D05299388910051BA13 /* PersistanceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9732D04299388910051BA13 /* PersistanceService.swift */; };
+		C9732D0729938A460051BA13 /* CoreDataError.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9732D0629938A460051BA13 /* CoreDataError.swift */; };
+		C9732D0B2993DD2D0051BA13 /* CoreDataImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9732D0A2993DD2D0051BA13 /* CoreDataImage.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -74,6 +78,10 @@
 		C9732CF729913CB10051BA13 /* ItemReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemReducer.swift; sourceTree = "<group>"; };
 		C9732CF9299140400051BA13 /* IntReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntReducer.swift; sourceTree = "<group>"; };
 		C9732CFB299141AA0051BA13 /* imagesReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = imagesReducer.swift; sourceTree = "<group>"; };
+		C9732D00299299600051BA13 /* CoreDataConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataConstants.swift; sourceTree = "<group>"; };
+		C9732D04299388910051BA13 /* PersistanceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistanceService.swift; sourceTree = "<group>"; };
+		C9732D0629938A460051BA13 /* CoreDataError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataError.swift; sourceTree = "<group>"; };
+		C9732D0A2993DD2D0051BA13 /* CoreDataImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataImage.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -106,6 +114,7 @@
 		C9732CA0298FAF2E0051BA13 /* news_test */ = {
 			isa = PBXGroup;
 			children = (
+				C9732CFD299298B50051BA13 /* PersistanceLayer */,
 				C9732CE8298FCD5E0051BA13 /* Helpers */,
 				C9732CCB298FBBC50051BA13 /* Store */,
 				C9732CB9298FAF6F0051BA13 /* NetworkingLayer */,
@@ -114,7 +123,6 @@
 				C9732CAD298FAF2F0051BA13 /* Assets.xcassets */,
 				C9732CAF298FAF2F0051BA13 /* LaunchScreen.storyboard */,
 				C9732CB2298FAF2F0051BA13 /* Info.plist */,
-				C9732CAA298FAF2E0051BA13 /* news_test.xcdatamodeld */,
 				C9732CE0298FC1E70051BA13 /* GlobalConstants.swift */,
 			);
 			path = news_test;
@@ -262,6 +270,18 @@
 			path = Reducers;
 			sourceTree = "<group>";
 		};
+		C9732CFD299298B50051BA13 /* PersistanceLayer */ = {
+			isa = PBXGroup;
+			children = (
+				C9732CAA298FAF2E0051BA13 /* news_test.xcdatamodeld */,
+				C9732D00299299600051BA13 /* CoreDataConstants.swift */,
+				C9732D04299388910051BA13 /* PersistanceService.swift */,
+				C9732D0A2993DD2D0051BA13 /* CoreDataImage.swift */,
+				C9732D0629938A460051BA13 /* CoreDataError.swift */,
+			);
+			path = PersistanceLayer;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -333,9 +353,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				C9732CEE298FDEA60051BA13 /* NewsListBuilder.swift in Sources */,
+				C9732D0B2993DD2D0051BA13 /* CoreDataImage.swift in Sources */,
 				C9732CE7298FCCAA0051BA13 /* Article.swift in Sources */,
 				C9732CA6298FAF2E0051BA13 /* NewsListViewController.swift in Sources */,
 				C9732CDC298FBFB40051BA13 /* NewsListNetworkService.swift in Sources */,
+				C9732D05299388910051BA13 /* PersistanceService.swift in Sources */,
 				C9732CE1298FC1E70051BA13 /* GlobalConstants.swift in Sources */,
 				C9732CF829913CB10051BA13 /* ItemReducer.swift in Sources */,
 				C9732CFC299141AA0051BA13 /* imagesReducer.swift in Sources */,
@@ -354,10 +376,12 @@
 				C9732CF32991173B0051BA13 /* AppState.swift in Sources */,
 				C9732CE4298FCAED0051BA13 /* NetworkModel.swift in Sources */,
 				C9732CAC298FAF2E0051BA13 /* news_test.xcdatamodeld in Sources */,
+				C9732D0729938A460051BA13 /* CoreDataError.swift in Sources */,
 				C9732CC4298FB1360051BA13 /* NewsListViewInput.swift in Sources */,
 				C9732CD9298FBD600051BA13 /* HTTPMethod.swift in Sources */,
 				C9732CD7298FBD600051BA13 /* HTTPRequest.swift in Sources */,
 				C9732CFA299140400051BA13 /* IntReducer.swift in Sources */,
+				C9732D01299299600051BA13 /* CoreDataConstants.swift in Sources */,
 				C9732CEA298FCD800051BA13 /* ArticleNetworkParser.swift in Sources */,
 				C9732CD5298FBD600051BA13 /* NetworkClient.swift in Sources */,
 				C9732CDA298FBD600051BA13 /* HTTPError.swift in Sources */,

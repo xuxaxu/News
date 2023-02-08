@@ -32,3 +32,24 @@ func pullback<LocalValue, GlobalValue, Action>(_ reducer: @escaping (inout Local
         set(&globalValue, localValue)
     }
 }
+
+
+enum AppAction {
+    case items(ItemAction)
+    case page(PageAction)
+    case images(ImageAction)
+}
+
+enum PageAction {
+    case incrementPage
+    case resetPage
+}
+
+enum ItemAction {
+    case addArticle(Article)
+    case clear
+}
+
+enum ImageAction {
+    case setImage(image: UIImage, url: URL)
+}
