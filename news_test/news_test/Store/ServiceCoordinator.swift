@@ -34,9 +34,7 @@ class ServiceCoordinatorImp: ServiceCoordinator {
         self.persistanceService = persistanceService
     }
     func askNews() {
-        store.reduce(.items(.clear))
-        store.reduce(.page(.resetPage))
-        persistanceService.deleteAllImages(completion: {_ in })
+        clearArticles()
         askNextPortionOfNews()
     }
     func askNextPortionOfNews() {
@@ -45,18 +43,10 @@ class ServiceCoordinatorImp: ServiceCoordinator {
             switch result {
             case .failure(let error):
                 NotificationCenter.default.post(name: .ErrorDuringNewsLoading, object: error)
-                self?.persistanceService.getAllArticles { [weak self] result in
-                    switch result {
-                    case .failure(let error):
-                        NotificationCenter.default.post(name: .ErrorDuringNewsLoading, object: error)
-                    case .success(let items):
-                        for item in items {
-                            self?.store.reduce(.items(.addArticle(item)))
-                        }
-                    }
-                }
+                self?.turnToPersistance()
             case .success(let response):
                 guard let self else { return }
+                self.turnToNet()
                 for netArticle in response.articles {
                     if let article = self.parser.parse(article: netArticle) {
                         self.store.reduce(.items(.addArticle(article)))
@@ -90,8 +80,50 @@ class ServiceCoordinatorImp: ServiceCoordinator {
     func openDetail(_ index: Int) {
         
     }
+    private func turnToPersistance() {
+        if !store.state.dataFromPersistance {
+            store.reduce(.dataFromPersistance(.setFromPersistance))
+            clearArticles()
+            getArticlesFromPersistance()
+        }
+    }
+    private func turnToNet() {
+        if store.state.dataFromPersistance {
+            store.reduce(.dataFromPersistance(.setFromNet))
+            persistanceService.deleteAllImages(completion: {_ in })
+        }
+    }
     private func saveArticles() {
         persistanceService.postAllArticles(store.state.items, completion: {_ in } )
+    }
+    private func getArticlesFromPersistance() {
+        persistanceService.getAllArticles { [weak self] result in
+            switch result {
+            case .failure(let error):
+                NotificationCenter.default.post(name: .ErrorDuringNewsLoading, object: error)
+            case .success(let items):
+                for item in items {
+                    self?.store.reduce(.items(.addArticle(item)))
+                }
+                self?.getImagesFromPersistance()
+            }
+        }
+    }
+    private func getImagesFromPersistance() {
+        persistanceService.getImages() { [weak self] result in
+            switch result {
+            case .failure(let error):
+                NotificationCenter.default.post(name: .ErrorDuringNewsLoading, object: error)
+            case .success(let images):
+                for item in images {
+                    self?.store.reduce(.images(.setImage(image: item.value, url: item.key)))
+                }
+            }
+        }
+    }
+    private func clearArticles() {
+        store.reduce(.items(.clear))
+        store.reduce(.page(.resetPage))
     }
 }
 

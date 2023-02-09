@@ -41,7 +41,8 @@
 		C9732D01299299600051BA13 /* CoreDataConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9732D00299299600051BA13 /* CoreDataConstants.swift */; };
 		C9732D05299388910051BA13 /* PersistanceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9732D04299388910051BA13 /* PersistanceService.swift */; };
 		C9732D0729938A460051BA13 /* CoreDataError.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9732D0629938A460051BA13 /* CoreDataError.swift */; };
-		C9732D0B2993DD2D0051BA13 /* CoreDataImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9732D0A2993DD2D0051BA13 /* CoreDataImage.swift */; };
+		C9732D0D299507B40051BA13 /* NewsListRefreshCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9732D0C299507B40051BA13 /* NewsListRefreshCell.swift */; };
+		C9732D0F29951F860051BA13 /* DataFromPersistanceReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9732D0E29951F860051BA13 /* DataFromPersistanceReducer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -81,7 +82,8 @@
 		C9732D00299299600051BA13 /* CoreDataConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataConstants.swift; sourceTree = "<group>"; };
 		C9732D04299388910051BA13 /* PersistanceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistanceService.swift; sourceTree = "<group>"; };
 		C9732D0629938A460051BA13 /* CoreDataError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataError.swift; sourceTree = "<group>"; };
-		C9732D0A2993DD2D0051BA13 /* CoreDataImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataImage.swift; sourceTree = "<group>"; };
+		C9732D0C299507B40051BA13 /* NewsListRefreshCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsListRefreshCell.swift; sourceTree = "<group>"; };
+		C9732D0E29951F860051BA13 /* DataFromPersistanceReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataFromPersistanceReducer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -190,6 +192,7 @@
 			isa = PBXGroup;
 			children = (
 				C9732CC7298FB6110051BA13 /* NewsListCellView.swift */,
+				C9732D0C299507B40051BA13 /* NewsListRefreshCell.swift */,
 			);
 			path = NewsListTableViewCell;
 			sourceTree = "<group>";
@@ -263,6 +266,7 @@
 			isa = PBXGroup;
 			children = (
 				C9732CF429911BF50051BA13 /* AppStateReducer.swift */,
+				C9732D0E29951F860051BA13 /* DataFromPersistanceReducer.swift */,
 				C9732CF729913CB10051BA13 /* ItemReducer.swift */,
 				C9732CF9299140400051BA13 /* IntReducer.swift */,
 				C9732CFB299141AA0051BA13 /* imagesReducer.swift */,
@@ -276,7 +280,6 @@
 				C9732CAA298FAF2E0051BA13 /* news_test.xcdatamodeld */,
 				C9732D00299299600051BA13 /* CoreDataConstants.swift */,
 				C9732D04299388910051BA13 /* PersistanceService.swift */,
-				C9732D0A2993DD2D0051BA13 /* CoreDataImage.swift */,
 				C9732D0629938A460051BA13 /* CoreDataError.swift */,
 			);
 			path = PersistanceLayer;
@@ -353,7 +356,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C9732CEE298FDEA60051BA13 /* NewsListBuilder.swift in Sources */,
-				C9732D0B2993DD2D0051BA13 /* CoreDataImage.swift in Sources */,
+				C9732D0D299507B40051BA13 /* NewsListRefreshCell.swift in Sources */,
 				C9732CE7298FCCAA0051BA13 /* Article.swift in Sources */,
 				C9732CA6298FAF2E0051BA13 /* NewsListViewController.swift in Sources */,
 				C9732CDC298FBFB40051BA13 /* NewsListNetworkService.swift in Sources */,
@@ -384,6 +387,7 @@
 				C9732D01299299600051BA13 /* CoreDataConstants.swift in Sources */,
 				C9732CEA298FCD800051BA13 /* ArticleNetworkParser.swift in Sources */,
 				C9732CD5298FBD600051BA13 /* NetworkClient.swift in Sources */,
+				C9732D0F29951F860051BA13 /* DataFromPersistanceReducer.swift in Sources */,
 				C9732CDA298FBD600051BA13 /* HTTPError.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

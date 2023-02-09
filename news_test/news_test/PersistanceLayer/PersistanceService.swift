@@ -33,7 +33,7 @@ final class CoreDataPersistance: PersistanceService {
     func getAllArticles(completion: @escaping (Result<[Article], Error>) -> Void) {
         do {
             let items = try getAllArticlesToContext()
-            let articleItems = items.map { getArticle($0) }
+            let articleItems = items.sorted(by: { $0.index < $1.index }).map { getArticle($0) }
             completion(.success(articleItems))
         } catch {
             completion(.failure(error))
@@ -43,7 +43,7 @@ final class CoreDataPersistance: PersistanceService {
         let deleteFetch = NSFetchRequest<NSFetchRequestResult>(entityName: CoreDataConstants.articlesEntityName)
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: deleteFetch)
         do {
-            let entity = try getEntityDescription()
+            let entity = try getArticleEntityDescription()
             try container.viewContext.execute(deleteRequest)
             for i in 0..<items.count {
                 getCoreDataArticleFromArticle(items[i], i, entity: entity)
@@ -54,10 +54,17 @@ final class CoreDataPersistance: PersistanceService {
         }
     }
     
-    private func getEntityDescription() throws -> NSEntityDescription {
+    private func getArticleEntityDescription() throws -> NSEntityDescription {
         guard let entity = NSEntityDescription.entity(forEntityName: CoreDataConstants.articlesEntityName,
                                                       in: container.viewContext) else {
             throw CoreDataError.noEntity(name: CoreDataConstants.articlesEntityName)
+        }
+        return entity
+    }
+    private func getImageEntityDescription() throws -> NSEntityDescription {
+        guard let entity = NSEntityDescription.entity(forEntityName: CoreDataConstants.imagesEntityName,
+                                                      in: container.viewContext) else {
+            throw CoreDataError.noEntity(name: CoreDataConstants.imagesEntityName)
         }
         return entity
     }
@@ -101,13 +108,16 @@ final class CoreDataPersistance: PersistanceService {
                        url:  (coreDataArticle.url == nil) ? nil : URL(string: coreDataArticle.url!),
                        urlToImage: (coreDataArticle.urlToImage == nil) ? nil : URL(string: coreDataArticle.urlToImage!))
     }
-    
+    @discardableResult
+    private func getAllImagesToContext() throws -> [CoreDataImage] {
+        return try container.viewContext.fetch(CoreDataImage.fetchRequest())
+    }
     func getImages(completion: @escaping (Result<[URL : UIImage], Error>) -> Void) {
         do {
-            let coreDataImages = try container.viewContext.fetch(CoreDataImage.fetchRequest())
+            let coreDataImages = try getAllImagesToContext()
             var images = [URL: UIImage]()
             for item in coreDataImages {
-                if let url = URL(string: item.url), let data = item.image {
+                if let strUrl = item.url, let url = URL(string: strUrl), let data = item.image {
                     images[url] = UIImage(data: data)
                 }
             }
@@ -120,11 +130,13 @@ final class CoreDataPersistance: PersistanceService {
     func postImage(_ image: UIImage, url: URL, completion: @escaping (Result<Void, Error>) -> Void) {
         let strUrl = url.absoluteString
         do {
-            let entity = try getEntityDescription()
+            let entity = try getImageEntityDescription()
             if let coreDataImage = try getImageToContext(url: strUrl) {
                 coreDataImage.image = image.pngData()
             } else {
                 let coreDataImage = CoreDataImage(entity: entity, insertInto: container.viewContext)
+                coreDataImage.url = strUrl
+                coreDataImage.image = image.pngData()
             }
             saveContext(completion: completion)
         } catch {
@@ -155,7 +167,6 @@ final class CoreDataPersistance: PersistanceService {
         let deleteFetch = NSFetchRequest<NSFetchRequestResult>(entityName: CoreDataConstants.imagesEntityName)
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: deleteFetch)
         do {
-            let entity = try getEntityDescription()
             try container.viewContext.execute(deleteRequest)
             saveContext(completion: completion)
         } catch {

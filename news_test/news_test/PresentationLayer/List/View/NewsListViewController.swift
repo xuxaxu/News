@@ -27,6 +27,7 @@ class NewsListViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.register(NewsListCellView.self, forCellReuseIdentifier: Constants.cellNameForReuseId)
+        tableView.register(NewsListRefreshCell.self, forCellReuseIdentifier: Constants.cellRefreshForReusedId)
         tableView.estimatedRowHeight = DesignConstants.height
         tableView.rowHeight = DesignConstants.height //UITableView.automaticDimension
         
@@ -52,6 +53,14 @@ class NewsListViewController: UIViewController {
 extension NewsListViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard !tableView.refreshControl!.isRefreshing else {
+            if let cell = tableView.dequeueReusableCell(withIdentifier: Constants.cellRefreshForReusedId, for: indexPath) as? NewsListRefreshCell {
+                cell.configure()
+                return cell
+            } else {
+                fatalError()
+            }
+        }
         if let cell = tableView.dequeueReusableCell(withIdentifier: Constants.cellNameForReuseId, for: indexPath) as? NewsListCellView,
            let item = output.getItem(for: indexPath) {
             cell.configure(with: item)
@@ -81,6 +90,7 @@ extension NewsListViewController: UITableViewDelegate, UITableViewDataSource {
 extension NewsListViewController {
     struct Constants {
         static let cellNameForReuseId = "NewsListCellViewReuseId"
+        static let cellRefreshForReusedId = "NewsListRefreshCellForLoading"
     }
 }
 
