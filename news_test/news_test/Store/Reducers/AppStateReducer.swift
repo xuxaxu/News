@@ -19,50 +19,17 @@ func reducer(_ state: inout AppState, _ action: AppAction) {
         pullback(persistanceReducer,
                  get: { $0.dataFromPersistance },
                  set: { $0.dataFromPersistance = $1 })(&state, persistanceAction)
+    case .currentArticle(let articleAction):
+        pullback(currentArticleReducer,
+                 get: { $0.currentArticle },
+                 set: { $0.currentArticle = $1 })(&state, articleAction)
     }
 }
-
-func combine(_ reducers: (inout AppState, AppAction) -> Void...) -> (inout AppState, AppAction) -> Void {
-    return { state, action in
-        for reducer in reducers {
-            reducer(&state, action)
-        }
-    }
-}
-
-func pullback<LocalValue, GlobalValue, Action>(_ reducer: @escaping (inout LocalValue, Action) -> Void,
-                                       get: @escaping (GlobalValue) -> LocalValue,
-                                       set: @escaping (inout GlobalValue, LocalValue) -> Void) -> (inout GlobalValue, Action) -> Void {
-    return { globalValue, action in
-        var localValue = get(globalValue)
-        reducer(&localValue, action)
-        set(&globalValue, localValue)
-    }
-}
-
 
 enum AppAction {
-    case items(ItemAction)
+    case items(ItemAction<Article>)
     case page(PageAction)
     case images(ImageAction)
     case dataFromPersistance(DataFromPersistaneAction)
-}
-
-enum PageAction {
-    case incrementPage
-    case resetPage
-}
-
-enum ItemAction {
-    case addArticle(Article)
-    case clear
-}
-
-enum ImageAction {
-    case setImage(image: UIImage, url: URL)
-}
-
-enum DataFromPersistaneAction {
-    case setFromPersistance
-    case setFromNet
+    case currentArticle(CurrentArticleAction)
 }

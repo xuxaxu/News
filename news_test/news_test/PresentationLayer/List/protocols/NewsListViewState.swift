@@ -1,5 +1,5 @@
-import UIKit
-enum NewsListState {
+
+enum NewsListViewState {
     case loading
     case error
     case success(Int?)

@@ -1,4 +1,4 @@
 protocol NewsListViewInput: AnyObject {
-    func update(with data: NewsListState)
-    func navigateTo(destination: Int)
+    func update(with data: NewsListViewState)
+    func navigateToDetail()
 }

@@ -1,0 +1,3 @@
+protocol DetailViewOutput: AnyObject {
+    
+}

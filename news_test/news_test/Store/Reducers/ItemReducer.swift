@@ -1,21 +1,22 @@
 import Foundation
 
-let itemReducer: (inout [Article], ItemAction) -> Void  = { items, action in
-    switch action {
-    case .addArticle(let article):
-        addArticle(&items, article)
-    case .clear:
-        clear(&items)
-    }
-    func addArticle(_ items: inout [Article], _ article: Article) {
-        items.append(article)
-        NotificationCenter.default.post(name: .NewsItemsChanges,
-                                        object: items.count - 1)
+func itemReducer<Element>(_ arr: inout [Element], _ action: ItemAction<Element>) {
+        switch action {
+        case .addElement(let element):
+            addElement(&arr, element)
+        case .clear:
+            clear(&arr)
+        }
+        func addElement(_ items: inout [Element], _ item: Element) {
+            items.append(item)
+        }
+        
+        func clear(_ items: inout [Element]) {
+            items = []
+        }
     }
 
-    func clear(_ items: inout [Article]) {
-        items = []
-        NotificationCenter.default.post(name: .NewsItemsChanges,
-                                        object: -1)
-    }
+public enum ItemAction<Item> {
+    case addElement(Item)
+    case clear
 }

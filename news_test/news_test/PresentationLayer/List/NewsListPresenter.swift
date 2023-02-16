@@ -2,7 +2,7 @@ import Foundation
 
 class NewsListPresenter {
     
-    private var serviceCoordinator: ServiceCoordinator
+    private var serviceCoordinator: BuisnessLogic
     
     private var isLodaing = false
     
@@ -12,7 +12,7 @@ class NewsListPresenter {
         }
     }
     
-    init(serviceCoordinator: ServiceCoordinator) {
+    init(serviceCoordinator: BuisnessLogic) {
         self.serviceCoordinator = serviceCoordinator
         subscribe()
     }
@@ -20,7 +20,7 @@ class NewsListPresenter {
     private func subscribe() {
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(newsChanges(_:)),
-                                               name: .NewsItemsChanges,
+                                               name: .StateChanges,
                                                object: nil)
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(imageLoaded(_:)),
@@ -75,7 +75,8 @@ extension NewsListPresenter: NewsListViewOutput {
     }
     
     func itemSelected(indexPath: IndexPath) {
-        serviceCoordinator.openDetail(indexPath.row)
+        serviceCoordinator.chooseArticle(for: indexPath.row)
+        view?.navigateToDetail()
     }
     
     

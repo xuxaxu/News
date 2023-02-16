@@ -1,55 +1,44 @@
 import Foundation
 import UIKit
 
-class Store: ObservableObject {
-    @Published var state: AppState
+public final class Store<Value, Action>: ObservableObject {
     
-    init(state: AppState, reducer: @escaping (inout AppState, AppAction) -> Void) {
+    @Published public private(set) var state: Value
+    
+    public init(state: Value, reducer: @escaping (inout Value, Action) -> Void) {
         self.state = state
         self.reducer = reducer
     }
     
-    let reducer: (inout AppState, AppAction) -> Void
+    private let reducer: (inout Value, Action) -> Void
     
-    func reduce(_ action: AppAction) {
+    public func execute(_ action: Action) {
         reducer(&state, action)
-    }
-    
-    func getArticle(at index: Int) -> NewsListItem? {
-        guard index < state.items.count else {
-            return nil
-        }
-        let article = state.items[index]
-        let image: UIImage?
-        if let imageUrl = article.urlToImage {
-            image = state.images[imageUrl]
-        } else {
-            image = nil
-        }
-        let wawDetailed = state.detailed[index] ?? 0
-        let item = NewsListItem(image: image, title: article.title, detailed: wawDetailed)
-            return item
-
-    }
-    func count() -> Int {
-        state.items.count
-    }
-    
-    func getImage(for index: Int) -> UIImage? {
-        guard index < state.items.count, let url = state.items[index].urlToImage else {
-            return nil
-        }
-        return state.images[url]
-    }
-    func getImageUrl(for index: Int) -> URL? {
-        guard index < state.items.count else {
-            return nil
-        }
-        return state.items[index].urlToImage
+        NotificationCenter.default.post(name: .StateChanges,
+                                        object: state)
     }
 }
 
 extension Notification.Name {
-    static let NewsItemsChanges = Notification.Name(
-        rawValue: "com.News-test.Store.changesInNewsArray")
+    static let StateChanges = Notification.Name(
+        rawValue: "com.News-test.Store.changesInMainState")
+}
+
+
+public func combine<Value, Action>(_ reducers: (inout Value, Action) -> Void...) -> (inout Value, Action) -> Void {
+    return { state, action in
+        for reducer in reducers {
+            reducer(&state, action)
+        }
+    }
+}
+
+public func pullback<LocalValue, GlobalValue, Action>(_ reducer: @escaping (inout LocalValue, Action) -> Void,
+                                       get: @escaping (GlobalValue) -> LocalValue,
+                                       set: @escaping (inout GlobalValue, LocalValue) -> Void) -> (inout GlobalValue, Action) -> Void {
+    return { globalValue, action in
+        var localValue = get(globalValue)
+        reducer(&localValue, action)
+        set(&globalValue, localValue)
+    }
 }

@@ -7,4 +7,5 @@ struct AppState {
     var detailed = [Int: Int]()
     var images = [URL: UIImage]()
     var dataFromPersistance = false
+    var currentArticle: Article?
 }

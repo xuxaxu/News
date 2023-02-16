@@ -9,7 +9,7 @@
         <attribute name="url" optional="YES" attributeType="String"/>
         <attribute name="urlToImage" optional="YES" attributeType="String"/>
     </entity>
-    <entity name="CoreDataImage" representedClassName="CoreDataImage" syncable="YES" codeGenerationType="class">
+    <entity name="CoreDataImage" representedClassName=".CoreDataImage" syncable="YES" codeGenerationType="class">
         <attribute name="image" optional="YES" attributeType="Binary"/>
         <attribute name="url" attributeType="String"/>
     </entity>

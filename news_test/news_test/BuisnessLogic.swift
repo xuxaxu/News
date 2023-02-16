@@ -1,32 +1,34 @@
 import Foundation
 
-protocol ServiceCoordinator {
+protocol BuisnessLogic {
     func askNews() -> Void
     func askNextPortionOfNews() -> Void
     func countOfNews() -> Int
     func getListItem(for index: Int) -> NewsListItem?
-    func openDetail(_ index: Int) -> Void
+    func chooseArticle(for index: Int) -> Void
+    func currentArticle() -> Article?
 }
 
-class ServiceCoordinatorImp: ServiceCoordinator {
+class BuisnessLogicImp: BuisnessLogic {
     
-    private let store: Store
+    private let store: Store<AppState, AppAction>
     private let newsListService: NewsListNetworkService
     private let parser: ArticleNetworkParser
     private let imageService: ImagesNetworkService
-    private let persistanceService: PersistanceService
+    private let persistanceService: CoreDataPersistance<Article>
     
-    static let shared: ServiceCoordinatorImp = .init(
+    static let shared: BuisnessLogicImp = .init(
         newsListNetworkService: NewsListNetworkServiceImp(networkClient: NetworkClientImp(urlSession: URLSession(configuration: .default))),
         articleParser: ArticleNetworkParserImp(),
         imageNetworkService: ImagesNetworkServiceImp(networkClient: NetworkClientImp(urlSession: URLSession(configuration: .default))),
-        persistanceService: CoreDataPersistance()
+        persistanceService: CoreDataPersistance(itemToCoreDataItem: CoreDataPersistance<Article>.fillCoreDataArticleFromArticle,
+                                                coreDataItemToItem: CoreDataPersistance<Article>.getArticle)
     )
     
     init(newsListNetworkService: NewsListNetworkService,
          articleParser: ArticleNetworkParser,
          imageNetworkService: ImagesNetworkService,
-         persistanceService: PersistanceService) {
+         persistanceService: CoreDataPersistance<Article>) {
         self.store = Store(state: AppState(), reducer: reducer(_:_:))
         self.newsListService = newsListNetworkService
         self.parser = articleParser
@@ -35,10 +37,14 @@ class ServiceCoordinatorImp: ServiceCoordinator {
     }
     func askNews() {
         clearArticles()
+        store.execute(.dataFromPersistance(.setFromNet))
         askNextPortionOfNews()
     }
     func askNextPortionOfNews() {
-        store.reduce(.page(.incrementPage))
+        guard !store.state.dataFromPersistance else {
+            return
+        }
+        store.execute(.page(.incrementPage))
         newsListService.getNews(page: store.state.currentPage) {[weak self] result in
             switch result {
             case .failure(let error):
@@ -49,7 +55,7 @@ class ServiceCoordinatorImp: ServiceCoordinator {
                 self.turnToNet()
                 for netArticle in response.articles {
                     if let article = self.parser.parse(article: netArticle) {
-                        self.store.reduce(.items(.addArticle(article)))
+                        self.store.execute(.items(.addElement(article)))
                         if let imageUrl = article.urlToImage {
                             self.loadImage(imageUrl, for: (self.store.count()) - 1)
                         }
@@ -63,7 +69,7 @@ class ServiceCoordinatorImp: ServiceCoordinator {
         store.count()
     }
     func getListItem(for index: Int) -> NewsListItem? {
-        store.getArticle(at: index)
+        store.getNewsListItem(at: index)
     }
     func loadImage(_ url: URL, for index: Int) {
         imageService.getImage(url: url) { [weak self] result in
@@ -71,39 +77,43 @@ class ServiceCoordinatorImp: ServiceCoordinator {
             case .failure(let error):
                 print("image loading error \(error)")
             case .success(let image):
-                self?.store.reduce(.images(.setImage(image: image, url: url)))
+                self?.store.execute(.images(.setImage(image: image, url: url)))
                 self?.persistanceService.postImage(image, url: url, completion: {_ in})
                 NotificationCenter.default.post(name: .ImageLoadedForNews, object: index)
             }
         }
     }
-    func openDetail(_ index: Int) {
-        
+    func chooseArticle(for index: Int) {
+        let article = store.getArticle(at: index)
+        store.execute(.currentArticle(.setCurrentArticle(article)))
+    }
+    func currentArticle() -> Article? {
+        store.state.currentArticle
     }
     private func turnToPersistance() {
         if !store.state.dataFromPersistance {
-            store.reduce(.dataFromPersistance(.setFromPersistance))
+            store.execute(.dataFromPersistance(.setFromPersistance))
             clearArticles()
             getArticlesFromPersistance()
         }
     }
     private func turnToNet() {
         if store.state.dataFromPersistance {
-            store.reduce(.dataFromPersistance(.setFromNet))
+            store.execute(.dataFromPersistance(.setFromNet))
             persistanceService.deleteAllImages(completion: {_ in })
         }
     }
     private func saveArticles() {
-        persistanceService.postAllArticles(store.state.items, completion: {_ in } )
+        persistanceService.postAllItems(store.state.items, completion: {_ in } )
     }
     private func getArticlesFromPersistance() {
-        persistanceService.getAllArticles { [weak self] result in
+        persistanceService.getAllItems { [weak self] result in
             switch result {
             case .failure(let error):
                 NotificationCenter.default.post(name: .ErrorDuringNewsLoading, object: error)
             case .success(let items):
                 for item in items {
-                    self?.store.reduce(.items(.addArticle(item)))
+                    self?.store.execute(.items(.addElement(item)))
                 }
                 self?.getImagesFromPersistance()
             }
@@ -116,14 +126,14 @@ class ServiceCoordinatorImp: ServiceCoordinator {
                 NotificationCenter.default.post(name: .ErrorDuringNewsLoading, object: error)
             case .success(let images):
                 for item in images {
-                    self?.store.reduce(.images(.setImage(image: item.value, url: item.key)))
+                    self?.store.execute(.images(.setImage(image: item.value, url: item.key)))
                 }
             }
         }
     }
     private func clearArticles() {
-        store.reduce(.items(.clear))
-        store.reduce(.page(.resetPage))
+        store.execute(.items(.clear))
+        store.execute(.page(.resetPage))
     }
 }
 

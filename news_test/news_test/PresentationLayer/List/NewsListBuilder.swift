@@ -5,7 +5,7 @@ class NewsListBuilder {
     // MARK: - Init
 
     init() {
-        presenter = NewsListPresenter(serviceCoordinator: ServiceCoordinatorImp.shared)
+        presenter = NewsListPresenter(serviceCoordinator: BuisnessLogicImp.shared)
         viewController = NewsListViewController(output: presenter)
         presenter.view = viewController
     }

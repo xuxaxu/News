@@ -95,7 +95,7 @@ extension NewsListViewController {
 }
 
 extension NewsListViewController: NewsListViewInput {
-    func update(with data: NewsListState) {
+    func update(with data: NewsListViewState) {
         switch data {
         case .success(let index):
             tableView.refreshControl?.endRefreshing()
@@ -103,7 +103,7 @@ extension NewsListViewController: NewsListViewInput {
               //  tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .left)
             //} else {
                 tableView.reloadData()
-            //} 
+            //}
         case .error:
             showError()
         case .loading:
@@ -111,8 +111,8 @@ extension NewsListViewController: NewsListViewInput {
         }
     }
     
-    func navigateTo(destination: Int) {
-        
+    func navigateToDetail() {
+        CoordinatorImp.shared.openDetail(in: self)
     }
     
     

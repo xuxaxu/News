@@ -3,10 +3,11 @@ import CoreData
 import UIKit
 
 protocol PersistanceService: AnyObject {
-    func getAllArticles(
-        completion: @escaping (Result<[Article], Error>) -> Void
+    associatedtype ItemType
+    func getAllItems(
+        completion: @escaping (Result<[ItemType], Error>) -> Void
     )
-    func postAllArticles(_ items: [Article],
+    func postAllItems(_ items: [ItemType],
                           completion: @escaping (Result<Void, Error>) -> Void)
     func getImages(completion: @escaping (Result<[URL: UIImage], Error>) -> Void)
     func postImage(_ image: UIImage,
@@ -16,11 +17,20 @@ protocol PersistanceService: AnyObject {
 }
 
 
-final class CoreDataPersistance: PersistanceService {
+final class CoreDataPersistance<ItemType>: PersistanceService {
     
     private var container: NSPersistentContainer
+    private let itemToCoreDataItem: (_ item: ItemType,
+                                     _ index: Int,
+                                     _ managedObject: inout CoreDataArticle) -> Void
+    private let coreDataItemToItem: (_ coreDataItem: CoreDataArticle) -> ItemType
     
-    init() {
+    init(itemToCoreDataItem: @escaping (_ item: ItemType,
+                              _ index: Int,
+                              _ managedObject: inout CoreDataArticle) -> Void,
+         coreDataItemToItem: @escaping (_ coreDataItem: CoreDataArticle) -> ItemType) {
+        self.itemToCoreDataItem = itemToCoreDataItem
+        self.coreDataItemToItem = coreDataItemToItem
         self.container = NSPersistentContainer(name: CoreDataConstants.coreDataModelName)
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
@@ -30,23 +40,24 @@ final class CoreDataPersistance: PersistanceService {
         })
     }
     
-    func getAllArticles(completion: @escaping (Result<[Article], Error>) -> Void) {
+    func getAllItems(completion: @escaping (Result<[ItemType], Error>) -> Void) {
         do {
-            let items = try getAllArticlesToContext()
-            let articleItems = items.sorted(by: { $0.index < $1.index }).map { getArticle($0) }
+            let items = try getAllItemsToContext()
+            let articleItems = items.sorted(by: { $0.index < $1.index }).map { coreDataItemToItem($0) }
             completion(.success(articleItems))
         } catch {
             completion(.failure(error))
         }
     }
-    func postAllArticles(_ items: [Article], completion: @escaping (Result<Void, Error>) -> Void) {
+    func postAllItems(_ items: [ItemType], completion: @escaping (Result<Void, Error>) -> Void) {
         let deleteFetch = NSFetchRequest<NSFetchRequestResult>(entityName: CoreDataConstants.articlesEntityName)
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: deleteFetch)
         do {
-            let entity = try getArticleEntityDescription()
+            let entity = try getItemsEntityDescription()
             try container.viewContext.execute(deleteRequest)
             for i in 0..<items.count {
-                getCoreDataArticleFromArticle(items[i], i, entity: entity)
+                var managedObject = CoreDataArticle(entity: entity, insertInto: container.viewContext)
+                itemToCoreDataItem(items[i], i, &managedObject)
             }
             saveContext(completion: completion)
         } catch {
@@ -54,7 +65,7 @@ final class CoreDataPersistance: PersistanceService {
         }
     }
     
-    private func getArticleEntityDescription() throws -> NSEntityDescription {
+    private func getItemsEntityDescription() throws -> NSEntityDescription {
         guard let entity = NSEntityDescription.entity(forEntityName: CoreDataConstants.articlesEntityName,
                                                       in: container.viewContext) else {
             throw CoreDataError.noEntity(name: CoreDataConstants.articlesEntityName)
@@ -68,16 +79,7 @@ final class CoreDataPersistance: PersistanceService {
         }
         return entity
     }
-    private func getCoreDataArticleFromArticle(_ item: Article, _ index: Int, entity: NSEntityDescription) {
-        let managedObject = CoreDataArticle(entity: entity, insertInto: container.viewContext)
-        managedObject.index = Int16(index)
-        managedObject.urlToImage = item.urlToImage?.absoluteString
-        managedObject.url = item.url?.absoluteString
-        managedObject.date = item.date
-        managedObject.title = item.title
-        managedObject.description_ = item.description
-        managedObject.source = item.source
-    }
+    
     private func getCoreDataImageFromImage(_ image: UIImage, _ url: URL, entity: NSEntityDescription) {
         let managedObject = CoreDataImage(entity: entity, insertInto: container.viewContext)
         managedObject.url = url.absoluteString
@@ -95,19 +97,11 @@ final class CoreDataPersistance: PersistanceService {
         }
     }
     @discardableResult
-    private func getAllArticlesToContext() throws -> [CoreDataArticle] {
+    private func getAllItemsToContext() throws -> [CoreDataArticle] {
         return try container.viewContext.fetch(CoreDataArticle.fetchRequest())
     }
     
-    func getArticle(_ coreDataArticle: CoreDataArticle) -> Article {
-        return Article(source: coreDataArticle.source,
-                       title: coreDataArticle.title ?? "",
-                       description: coreDataArticle.description,
-                       image: nil,
-                       date: coreDataArticle.date,
-                       url:  (coreDataArticle.url == nil) ? nil : URL(string: coreDataArticle.url!),
-                       urlToImage: (coreDataArticle.urlToImage == nil) ? nil : URL(string: coreDataArticle.urlToImage!))
-    }
+    
     @discardableResult
     private func getAllImagesToContext() throws -> [CoreDataImage] {
         return try container.viewContext.fetch(CoreDataImage.fetchRequest())
