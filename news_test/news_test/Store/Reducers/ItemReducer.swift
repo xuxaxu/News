@@ -1,6 +1,6 @@
 import Foundation
 
-func itemReducer<Element>(_ arr: inout [Element], _ action: ItemAction<Element>) {
+func itemReducer<Element>(_ arr: inout [Element], _ action: ItemAction<Element>) -> [Effect<ItemAction<Element>>] {
         switch action {
         case .addElement(let element):
             addElement(&arr, element)
@@ -14,6 +14,7 @@ func itemReducer<Element>(_ arr: inout [Element], _ action: ItemAction<Element>)
         func clear(_ items: inout [Element]) {
             items = []
         }
+        return []
     }
 
 public enum ItemAction<Item> {

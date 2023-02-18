@@ -7,6 +7,7 @@ protocol BuisnessLogic {
     func getListItem(for index: Int) -> NewsListItem?
     func chooseArticle(for index: Int) -> Void
     func currentArticle() -> Article?
+    func getCurrentURLAction() -> () -> URL?
 }
 
 class BuisnessLogicImp: BuisnessLogic {
@@ -37,14 +38,14 @@ class BuisnessLogicImp: BuisnessLogic {
     }
     func askNews() {
         clearArticles()
-        store.execute(.dataFromPersistance(.setFromNet))
+        store.send(.dataFromPersistance(.setFromNet))
         askNextPortionOfNews()
     }
     func askNextPortionOfNews() {
         guard !store.state.dataFromPersistance else {
             return
         }
-        store.execute(.page(.incrementPage))
+        store.send(.page(.incrementPage))
         newsListService.getNews(page: store.state.currentPage) {[weak self] result in
             switch result {
             case .failure(let error):
@@ -55,7 +56,7 @@ class BuisnessLogicImp: BuisnessLogic {
                 self.turnToNet()
                 for netArticle in response.articles {
                     if let article = self.parser.parse(article: netArticle) {
-                        self.store.execute(.items(.addElement(article)))
+                        self.store.send(.items(.addElement(article)))
                         if let imageUrl = article.urlToImage {
                             self.loadImage(imageUrl, for: (self.store.count()) - 1)
                         }
@@ -77,7 +78,7 @@ class BuisnessLogicImp: BuisnessLogic {
             case .failure(let error):
                 print("image loading error \(error)")
             case .success(let image):
-                self?.store.execute(.images(.setImage(image: image, url: url)))
+                self?.store.send(.images(.setImage(image: image, url: url)))
                 self?.persistanceService.postImage(image, url: url, completion: {_ in})
                 NotificationCenter.default.post(name: .ImageLoadedForNews, object: index)
             }
@@ -85,21 +86,21 @@ class BuisnessLogicImp: BuisnessLogic {
     }
     func chooseArticle(for index: Int) {
         let article = store.getArticle(at: index)
-        store.execute(.currentArticle(.setCurrentArticle(article)))
+        store.send(.currentArticle(.setCurrentArticle(article)))
     }
     func currentArticle() -> Article? {
         store.state.currentArticle
     }
     private func turnToPersistance() {
         if !store.state.dataFromPersistance {
-            store.execute(.dataFromPersistance(.setFromPersistance))
+            store.send(.dataFromPersistance(.setFromPersistance))
             clearArticles()
             getArticlesFromPersistance()
         }
     }
     private func turnToNet() {
         if store.state.dataFromPersistance {
-            store.execute(.dataFromPersistance(.setFromNet))
+            store.send(.dataFromPersistance(.setFromNet))
             persistanceService.deleteAllImages(completion: {_ in })
         }
     }
@@ -113,7 +114,7 @@ class BuisnessLogicImp: BuisnessLogic {
                 NotificationCenter.default.post(name: .ErrorDuringNewsLoading, object: error)
             case .success(let items):
                 for item in items {
-                    self?.store.execute(.items(.addElement(item)))
+                    self?.store.send(.items(.addElement(item)))
                 }
                 self?.getImagesFromPersistance()
             }
@@ -126,14 +127,20 @@ class BuisnessLogicImp: BuisnessLogic {
                 NotificationCenter.default.post(name: .ErrorDuringNewsLoading, object: error)
             case .success(let images):
                 for item in images {
-                    self?.store.execute(.images(.setImage(image: item.value, url: item.key)))
+                    self?.store.send(.images(.setImage(image: item.value, url: item.key)))
                 }
             }
         }
     }
     private func clearArticles() {
-        store.execute(.items(.clear))
-        store.execute(.page(.resetPage))
+        store.send(.items(.clear))
+        store.send(.page(.resetPage))
+    }
+    
+    func getCurrentURLAction() -> () -> URL? {
+        return { [weak self] in
+            self?.store.state.currentArticle?.url
+        }
     }
 }
 

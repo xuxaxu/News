@@ -20,4 +20,10 @@ public class CoordinatorImp: Coordinator {
         let detailBuilder = DetailBuilder()
         viewController.show(detailBuilder.viewController, sender: nil)
     }
+    
+    func openWebView(in viewController: UIViewController) {
+        let action = BuisnessLogicImp.shared.getCurrentURLAction()
+        let webViewBuilder = WebViewBuilder(getUrlAction: action)
+        viewController.show(webViewBuilder.viewController, sender: nil)
+    }
 }

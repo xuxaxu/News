@@ -24,5 +24,7 @@ class DetailPresenter {
 }
 
 extension DetailPresenter: DetailViewOutput {
-    
+    func buttonAction() {
+        view?.navigateToWebView()
+    }
 }

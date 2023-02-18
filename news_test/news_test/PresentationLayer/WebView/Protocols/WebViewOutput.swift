@@ -1,0 +1,3 @@
+protocol WebViewOutput {
+    func getData()
+}
